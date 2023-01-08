@@ -37,31 +37,64 @@ $if Bash
 "\eh\em":     "\e[Hman \C-m\e[1~\em"                    # man {}
 
 # (i)nsert - ($)ubshell, (l)oop, ...
-"\eI\e$":       "$(?)\e[1~\e? \e[D'"                    # insert subshell $(...)
-"\ei\el":       "\e[1~\el\C-b\C-b*"                     # insert for-loop $i
-"\ei\el\eb":    "\C-b?\C-h\C-h\e[3~"                    # goto body after for-loop
+"\eI\e$":        "$(?)\e[1~\e? \e[D'"                   # insert subshell $(...)
+"\ei\el":        "\e[1~\el\C-b\C-b*"                    # insert for-loop $i
+"\ei\el\eb":     "\C-b?\C-h\C-h\e[3~"                   # goto body after for-loop
+"\eI\eI":        "OLDIFS=$IFS; $IFS=$'\\n'; "           # insert IFS backup and set $'\n'
+"\eI\eI\eR":     "IFS=$OLDIFS "                         # insert IFS restore
+"\ei\eg":        "grep '?'\e[1~\e?"                     # insert grep
+"\ei\eg\ee":     "grep -E '?' \e[1~\e?"                 # insert grep -E
+"\ei\eg\ev":     "grep -v '?' \e[1~\e?"                 # insert grep -v
+"\ei\eg\ee\ev":  "grep -Ev '?' \e[1~\e?"                # insert grep -Ev
+"\ei\ed":        "\e.\C-b  ; \C-x\C-x"                  # insert cmd delimiter at next blank
 
-# (a)ppend to line, e.g. (l)oop - (b)ody
-"\ea\es":     "\e[F -e '/?/\e[1~\e?'"                   # append sed match //
-"\ea\es\C-s": "\e[F -e 's/?//\e[1~\e?'"                 # append sed subst s///
+# (a)ppend, e.g. (l)oop - (b)ody
+"\ea\es":        " -e '/?/' \e[1~\e?"                   # append sed match //
+"\ea\es\es":     " -e 's/?//' \e[1~\e?"                 # append sed subst s///
+"\ea\ea\es":     "\e[F\ea\es"                           # append sed match //
+"\ea\ea\es\es":  "\e[F\ea\es\C-s"                       # append sed subst s///
 
 # (p)ipe to (a)pp, e.g. (p)ipe to (g)rep
-"\ep\eg":        "\e[F | grep -E '?'\e[1~\e?"           # pipe to grep -E
-"\ep\eg\ev":     "\e[F | grep -Ev '?'\e[1~\e?"          # pipe to grep -Ev
-"\ep\ea":        "\e[F | awk '{print ?}' \e[1~\e?"      # pipe to awk
-"\ep\ea\en":     "\e[F | awk NF"                        # pipe to awk NF / remove empty lines
-"\ep\ex":        "\e[F | xargs "                        # pipe to xargs
-"\ep\el":        "\e[F | less "                         # pipe to less
-"\ep\et":        "\e[F | tail "                         # pipe to tail
-"\ep\er":        "\e[F | read X\e[D"                    # pipe to read
-"\ep\ep\ep":     "\e[F | perl -pe ' '\e[D\e[D"          # pipe to perl -pe
-"\ep\ep":        "\e[F | perl -ne ' '\e[D\e[D"          # pipe to perl -ne
-"\ep\es":        "\e[F | sed -re '/?/'\e[1~\e?"         # pipe to sed //
-"\ep\es\es":     "\e[F | sed -re 's/X//\e[1~\e?'"       # pipe to sed s///
-"\ep\ew":        "\e[F | wc -l "                        # pipe to wc -l
-"\ep\ew\ec":     "\e[F | wc -c "                        # pipe to wc -c
-"\eP\eS":        "\e[F | sort "                         # pipe to sort
-"\eP\eS\eU":     "\e[F | sort -u "                      # pipe to sort -u
+"\ep\eg":           " | \ei\eg"                        # pipe to grep
+"\ep\eg\ee":        " | \ei\eg\ee"                     # pipe to grep -E
+"\ep\eg\ev":        " | \ei\eg\ev"                     # pipe to grep -v
+"\ep\eg\ee\ev":     " | \ei\eg\ee\ev"                  # pipe to grep -Ev
+"\ep\ea":           " | awk '{print ?}' \e[1~\e?"      # pipe to awk
+"\ep\ea\en":        " | awk NF"                        # pipe to awk NF / remove empty lines
+"\ep\ex":           " | xargs "                        # pipe to xargs
+"\ep\el":           " | less "                         # pipe to less
+"\ep\et":           " | tail "                         # pipe to tail
+"\ep\er":           " | read X\e[D"                    # pipe to read
+"\ep\ep\ep":        " | perl -pe ' '\e[D\e[D"          # pipe to perl -pe
+"\ep\ep":           " | perl -ne ' '\e[D\e[D"          # pipe to perl -ne
+"\ep\es":           " | sed -re '/?/'\e[1~\e?"         # pipe to sed //
+"\ep\es\es":        " | sed -re 's/?//'\e[1~\e?"       # pipe to sed s///
+"\ep\ew":           " | wc -l "                        # pipe to wc -l
+"\ep\ew\ec":        " | wc -c "                        # pipe to wc -c
+"\ep\et":           " | tee "                          # pipe to tee
+"\ep\et\ea":        " | tee -a "                       # pipe to tee -a
+"\eP\eS":           " | sort "                         # pipe to sort
+"\eP\eS\eU":        " | sort -u "                      # pipe to sort -u
+"\ep\ep\eg":        "\ep\eg"                           # pipe at EOL to grep
+"\ep\ep\eg\ee":     "\ep\eg\ee"                        # pipe at EOL to grep -E
+"\ep\ep\eg\ev":     "\ep\eg\ev"                        # pipe at EOL to grep -v
+"\ep\ep\eg\ee\ev":  "\ep\eg\ee\ev"                     # pipe at EOL to grep -Ev
+"\ep\ep\ea":        "\ep\ea"                           # pipe at EOL to awk
+"\ep\ep\ea\en":     "\ep\ea\en"                        # pipe at EOL to awk NF / remove empty lines
+"\ep\ep\ex":        "\ep\ex"                           # pipe at EOL to xargs
+"\ep\ep\el":        "\ep\el"                           # pipe at EOL to less
+"\ep\ep\et":        "\ep\et"                           # pipe at EOL to tail
+"\ep\ep\er":        "\ep\er"                           # pipe at EOL to read
+"\ep\ep\ep\ep":     "\ep\ep\ep"                        # pipe at EOL to perl -pe
+"\ep\ep\ep":        "\ep\ep"                           # pipe at EOL to perl -ne
+"\ep\ep\es":        "\ep\es"                           # pipe at EOL to sed //
+"\ep\ep\es\es":     "\ep\es\es"                        # pipe at EOL to sed s///
+"\ep\ep\ew":        "\ep\ew"                           # pipe at EOL to wc -l
+"\ep\ep\ew\ec":     "\ep\ew\ec"                        # pipe at EOL to wc -c
+"\ep\ep\et":        "\ep\et"                           # pipe at EOL to tee
+"\ep\ep\ew\ea":     "\ep\et\ea"                        # pipe at EOL to tee -a
+"\eP\eP\eS":        "\eP\eS"                           # pipe at EOL to sort
+"\eP\eP\eS\eU":     "\eP\eS\eU"                        # pipe at EOL to sort -u
 
 # (r)edirect std(o)ut, std(e)rr, (a)ll
 "\er\ei":          " 1> "
@@ -83,9 +116,10 @@ $if Bash
 "\e'":          "\e[H'\e[F' "                                     # quote '...'
 "\el":          "\e[H\e[1~\el\eh \e[F\e[1~\el\eb\e[1~\e?\C-i\C-i" # for loop $i
 "\el\ej":       "\e[H\e[2~\el\eh \e[F\e[2~\el\eb\e[1~\e?\C-i\C-i" # for loop $j
+"\eI"           "\e[H\eI\eI\e[F; \eI\eI\eR"                       # IFS=$'\n' and reset
 
 # comments
-"\e+":          "\e.\e[H\C-b\#\e[3~\C-x\C-x\e[D"                  # uncomment (see \e#)
+"\e+":          "\e.\e[H\e[3~\C-x\C-x\e[D"                       # uncomment (see \e#)
 "\e+\e+":       "\e+\e[F"                                        # uncomment, enforce cursor to end
 
 # move cursor
@@ -154,10 +188,10 @@ $endif
 # editor: LINES: move, delete, modify 
 "\e[H":         beginning-of-line            # Home
 "\e[F":         end-of-line                  # End
-"\e[1;3F":      kill-line                    # Meta + Fn =>
-"\e[1;5F":      kill-line                    # Ctrl + Fn  =>
-"\e[1;3H":      backward-kill-line           # Meta + Fn  <=
-"\e[1;5H":      backward-kill-line           # Ctrl + Fn  <=
+"\e[1;3F":      kill-line                    # Meta + Fn + =>
+"\e[1;5F":      kill-line                    # Ctrl + Fn + =>
+"\e[1;3H":      backward-kill-line           # Meta + Fn + <=
+"\e[1;5H":      backward-kill-line           # Ctrl + Fn + <=
 "\C-x\C-r\C-l": redraw-current-line
 
 "\C-u":         unix-line-discard
