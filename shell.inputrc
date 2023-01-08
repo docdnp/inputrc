@@ -1,0 +1,219 @@
+#!/bin/bash
+# $include ~/.inputrc-remove-default
+
+set show-all-if-ambiguous on
+set show-all-if-unmodified on
+set mark-symlinked-directories on
+set completion-prefix-display-length 8
+set page-completions off
+set colored-stats on
+set colored-completion-prefix on
+set visible-stats on
+set input-meta on
+set output-meta on
+set convert-meta off
+
+$if Bash
+# commands
+
+# helper
+"\e[1~\eh":     "\e[A\C-b\C-b \C-k\C-k"                 # go to prev. hist. item, 
+                                                        #  -> remove all AFTER LAST blank
+"\e[1~\em":     "\e[A\C-b\C-b \C-u\e[3~\e[F"            # go to prev. hist. item, 
+                                                        #  -> remove all BEFORE FIRST blank
+"\e[1~\e?":     "\C-b\C-b?\e[3~\e."                     # go to prev. char '?', remove it
+"\e[1~\el":     "\e[1~\el\eh * \e[1~\el\eb"             # for loop: full pattern
+"\e[1~\el\eh":  "for i in"                              # for loop: header, var $i
+"\e[1~\el\eb":  "; do echo $i? ; done"                  # for loop: body, var $i
+"\e[2~\el\eh":  "for j in"                              # for loop: header, var $j
+"\e[2~\el\eb":  "; do echo $j? ; done"                  # for loop: body, var $j
+"\e[5C":        "\e[C\e[C\e[C\e[C\e[C"
+"\e[7C":        "\e[5C\e[C\e[C"
+
+
+# (h)elp - (l)ong, (s)hort, (m)anpage
+"\eh\el":     "\e[F --help\C-m\e[1~\eh"                 # --help
+"\eh\es":     "\e[F -h\C-m\e[1~\eh"                     # -h
+"\eh\em":     "\e[Hman \C-m\e[1~\em"                    # man {}
+
+# (i)nsert - ($)ubshell, (l)oop, ...
+"\eI\e$":       "$(?)\e[1~\e? \e[D'"                    # insert subshell $(...)
+"\ei\el":       "\e[1~\el\C-b\C-b*"                     # insert for-loop $i
+"\ei\el\eb":    "\C-b?\C-h\C-h\e[3~"                    # goto body after for-loop
+
+# (a)ppend to line, e.g. (l)oop - (b)ody
+"\ea\es":     "\e[F -e '/?/\e[1~\e?'"                   # append sed match //
+"\ea\es\C-s": "\e[F -e 's/?//\e[1~\e?'"                 # append sed subst s///
+
+# (p)ipe to (a)pp, e.g. (p)ipe to (g)rep
+"\ep\eg":        "\e[F | grep -E '?'\e[1~\e?"           # pipe to grep -E
+"\ep\eg\ev":     "\e[F | grep -Ev '?'\e[1~\e?"          # pipe to grep -Ev
+"\ep\ea":        "\e[F | awk '{print ?}' \e[1~\e?"      # pipe to awk
+"\ep\ea\en":     "\e[F | awk NF"                        # pipe to awk NF / remove empty lines
+"\ep\ex":        "\e[F | xargs "                        # pipe to xargs
+"\ep\el":        "\e[F | less "                         # pipe to less
+"\ep\et":        "\e[F | tail "                         # pipe to tail
+"\ep\er":        "\e[F | read X\e[D"                    # pipe to read
+"\ep\ep\ep":     "\e[F | perl -pe ' '\e[D\e[D"          # pipe to perl -pe
+"\ep\ep":        "\e[F | perl -ne ' '\e[D\e[D"          # pipe to perl -ne
+"\ep\es":        "\e[F | sed -re '/?/'\e[1~\e?"         # pipe to sed //
+"\ep\es\es":     "\e[F | sed -re 's/X//\e[1~\e?'"       # pipe to sed s///
+"\ep\ew":        "\e[F | wc -l "                        # pipe to wc -l
+"\ep\ew\ec":     "\e[F | wc -c "                        # pipe to wc -c
+"\eP\eS":        "\e[F | sort "                         # pipe to sort
+"\eP\eS\eU":     "\e[F | sort -u "                      # pipe to sort -u
+
+# (r)edirect std(o)ut, std(e)rr, (a)ll
+"\er\ei":          " 1> "
+"\er\ee":          " 2> "
+"\er\ea":          " >& "
+"\er\ei\en":       " 1> /dev/null"
+"\er\ee\en":       " 2> /dev/null"
+"\er\ea\en":       " >& /dev/null"
+
+# pr(e)fix or e(x)ecute prefixed line: e.g. (e)xport, (s)udo, ...
+"\ee\ee":       "\e.\e[Hexport \C-x\C-x\e[7C"
+"\ee\es":       "\e.\e[Hsudo \C-x\C-x\e[5C"
+"\ex\ee":       "\ee\ee\C-m"
+"\ex\es":       "\ee\es\C-m"
+
+# embrace line
+"\e$":          "\e[H$\(\e[F) "                                   # subshell $(..)
+"\e\"":         "\e[H\"\e[F\" "                                   # quote "..."
+"\e'":          "\e[H'\e[F' "                                     # quote '...'
+"\el":          "\e[H\e[1~\el\eh \e[F\e[1~\el\eb\e[1~\e?\C-i\C-i" # for loop $i
+"\el\ej":       "\e[H\e[2~\el\eh \e[F\e[2~\el\eb\e[1~\e?\C-i\C-i" # for loop $j
+
+# comments
+"\e+":          "\e.\e[H\C-b\#\e[3~\C-x\C-x\e[D"                  # uncomment (see \e#)
+"\e+\e+":       "\e+\e[F"                                        # uncomment, enforce cursor to end
+
+# move cursor
+"\e[1;7H": "\C-b\C-b "                                         # backward to next blank
+"\e[1;7F": "\C-b "                                             # forward to next blank
+$endif
+
+# admin helpers
+"\C-v":         quoted-insert
+"\C-x\C-r":     re-read-init-file
+"\C-x\C-v":     display-shell-version
+
+# macro recording
+"\e[1;5P":      start-kbd-macro          # Ctrl + F1
+"\e[1;5Q":      end-kbd-macro            # Ctrl + F2
+"\e[1;5R":      call-last-kbd-macro      # Ctrl + F3
+"\e[1;5S":      print-last-kbd-macro     # Ctrl + F4
+"\e[15;5~":     dump-macros              # Ctrl + F5
+
+# (shell-)completion
+"\ey":          menu-complete
+"\ex":          menu-complete-backward
+"\C-i":         complete
+
+# Actually most of the following completion looks useful 
+# when you don't use a state of the art competion system.
+# But the first 3 (maybe 4) are really useful.
+"\e(":          complete-into-braces        # :-)
+"\ed":          dabbrev-expand              # :-)
+"\eh":          dynamic-complete-history    # :-)
+"\ep":          possible-completions        # :-)
+
+"\e!\el":       possible-command-completions
+"\e/\el":       possible-filename-completions
+"\e@\el":       possible-hostname-completions
+"\e~\el":       possible-username-completions
+"\ev\el":       possible-variable-completions
+
+"\e!":          complete-command
+"\e/":          complete-filename
+"\e@":          complete-hostname
+"\e~":          complete-username
+"\ev":          complete-variable
+
+"\C-g\C-w":     glob-complete-word
+"\C-g\C-w\C-x": glob-expand-word
+"\C-g\C-l\C-x": glob-list-expansions
+
+"\ec":          insert-completions
+"\eH":          history-expand-line
+
+# # history: navigate and search
+"\e[A":         previous-history             # <up>
+"\e[B":         next-history                 # <down>
+"\e[1;5A":      beginning-of-history         # Ctrl + <up>
+"\e[1;5B":      end-of-history               # Ctrl + <down>
+"\C-r":         reverse-search-history
+"\C-s":         forward-search-history
+
+# editor: overall
+"\e[2~":        overwrite-mode               # Insert
+"\C-l":         clear-screen
+"\e\C-l":       clear-screen
+"\e:":         delete-horizontal-space
+
+# editor: LINES: move, delete, modify 
+"\e[H":         beginning-of-line            # Home
+"\e[F":         end-of-line                  # End
+"\e[1;3F":      kill-line                    # Meta + Fn =>
+"\e[1;5F":      kill-line                    # Ctrl + Fn  =>
+"\e[1;3H":      backward-kill-line           # Meta + Fn  <=
+"\e[1;5H":      backward-kill-line           # Ctrl + Fn  <=
+"\C-x\C-r\C-l": redraw-current-line
+
+"\C-u":         unix-line-discard
+"\C-k":         kill-line
+"\C-u\C-u":     kill-whole-line
+
+# editor: WORDS: move, delete, modify 
+"\e[1;3C":      forward-word                 # Meta + =>
+"\e[1;3D":      backward-word                # Meta + <=
+"\e[1;5C":      forward-word                 # Ctrl + =>
+"\e[1;5D":      backward-word                # Ctrl + <=
+"\e[1;4C":      kill-word
+"\e[3;5~":      kill-word
+"\e[1;4D":      backward-kill-word           # Meta + Shift + <=
+"\e\C-?":       backward-kill-word           # Meta + Backspace
+"\C-h":         backward-kill-word           # Ctrl + Backspace / Ctrl + H
+"\C-wu":        upcase-word
+"\C-wd":        downcase-word
+"\C-wc":        capitalize-word
+"\e\C-t":       transpose-words
+
+# editor: CHARS: move, delete, modify 
+"\e[C":         forward-char                  # =>
+"\e[D":         backward-char                 # <=
+"\e[3~":        delete-char                   # Del
+"\C-?":         backward-delete-char          # Backspace
+"\C-b":         character-search
+"\C-b\C-b":     character-search-backward
+"\et":          transpose-chars
+
+# editor: MISC: insert, expand and query data
+"\e#":          insert-comment
+"\ea":          insert-last-argument
+"\C-x\C-x":     exchange-point-and-mark
+"\C-@":         set-mark
+"\e.":          set-mark
+"\C-x\C-k":     kill-region
+
+# # dump-functions (not bound)
+# # dump-variables (not bound)
+# # alias-expand-line (not bound)
+
+# editor: copy, paste, insert, undo, discard, accept
+"\C-y\C-r":     copy-region-as-kill
+"\C-y\C-b":     copy-backward-word
+"\C-y\C-f":     copy-forward-word
+"\C-y":         yank
+
+"\e_":          yank-last-arg
+"\e=":          yank-nth-arg
+"\ev":          yank-pop
+
+"\ez":          undo
+"\eu":          undo
+"\er":          revert-line
+"\C-m":         accept-line
+
+"\C-o":         operate-and-get-next
+"\C-x\C-e":     edit-and-execute-command
