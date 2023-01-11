@@ -19,7 +19,7 @@ $if Bash
 # helper
 "\e[1~\eh":     "\e[A\C-b\C-b \C-k\C-k"                 # go to prev. hist. item, 
                                                         #  -> remove all AFTER LAST blank
-"\e[1~\em":     "\e[A\C-b\C-b \C-u\e[3~\e[F"            # go to prev. hist. item, 
+"\e[1~\em":     "\e[A\e[H\C-b \C-u\e[3~\e[F"            # go to prev. hist. item, 
                                                         #  -> remove all BEFORE FIRST blank
 "\e[1~\e?":     "\C-b\C-b?\e[3~\e."                     # go to prev. char '?', remove it
 "\e[1~\el":     "\e[1~\el\eh * \e[1~\el\eb"             # for loop: full pattern
@@ -27,6 +27,7 @@ $if Bash
 "\e[1~\el\eb":  "; do echo $i? ; done"                  # for loop: body, var $i
 "\e[2~\el\eh":  "for j in"                              # for loop: header, var $j
 "\e[2~\el\eb":  "; do echo $j? ; done"                  # for loop: body, var $j
+"\e[99~":       "\e[C\e[D"
 "\e[5C":        "\e[C\e[C\e[C\e[C\e[C"
 "\e[7C":        "\e[5C\e[C\e[C"
 
@@ -55,46 +56,46 @@ $if Bash
 "\ea\ea\es\es":  "\e[F\ea\es\C-s"                       # append sed subst s///
 
 # (p)ipe to (a)pp, e.g. (p)ipe to (g)rep
-"\ep\eg":           " | \ei\eg"                        # pipe to grep
-"\ep\eg\ee":        " | \ei\eg\ee"                     # pipe to grep -E
-"\ep\eg\ev":        " | \ei\eg\ev"                     # pipe to grep -v
-"\ep\eg\ee\ev":     " | \ei\eg\ee\ev"                  # pipe to grep -Ev
-"\ep\ea":           " | awk '{print ?}' \e[1~\e?"      # pipe to awk
-"\ep\ea\en":        " | awk NF"                        # pipe to awk NF / remove empty lines
-"\ep\ex":           " | xargs "                        # pipe to xargs
-"\ep\el":           " | less "                         # pipe to less
-"\ep\et":           " | tail "                         # pipe to tail
-"\ep\er":           " | read X\e[D"                    # pipe to read
-"\ep\ep\ep":        " | perl -pe ' '\e[D\e[D"          # pipe to perl -pe
-"\ep\ep":           " | perl -ne ' '\e[D\e[D"          # pipe to perl -ne
-"\ep\es":           " | sed -re '/?/'\e[1~\e?"         # pipe to sed //
-"\ep\es\es":        " | sed -re 's/?//'\e[1~\e?"       # pipe to sed s///
-"\ep\ew":           " | wc -l "                        # pipe to wc -l
-"\ep\ew\ec":        " | wc -c "                        # pipe to wc -c
-"\ep\et":           " | tee "                          # pipe to tee
-"\ep\et\ea":        " | tee -a "                       # pipe to tee -a
-"\eP\eS":           " | sort "                         # pipe to sort
-"\eP\eS\eU":        " | sort -u "                      # pipe to sort -u
-"\ep\ep\eg":        "\ep\eg"                           # pipe at EOL to grep
-"\ep\ep\eg\ee":     "\ep\eg\ee"                        # pipe at EOL to grep -E
-"\ep\ep\eg\ev":     "\ep\eg\ev"                        # pipe at EOL to grep -v
-"\ep\ep\eg\ee\ev":  "\ep\eg\ee\ev"                     # pipe at EOL to grep -Ev
-"\ep\ep\ea":        "\ep\ea"                           # pipe at EOL to awk
-"\ep\ep\ea\en":     "\ep\ea\en"                        # pipe at EOL to awk NF / remove empty lines
-"\ep\ep\ex":        "\ep\ex"                           # pipe at EOL to xargs
-"\ep\ep\el":        "\ep\el"                           # pipe at EOL to less
-"\ep\ep\et":        "\ep\et"                           # pipe at EOL to tail
-"\ep\ep\er":        "\ep\er"                           # pipe at EOL to read
-"\ep\ep\ep\ep":     "\ep\ep\ep"                        # pipe at EOL to perl -pe
-"\ep\ep\ep":        "\ep\ep"                           # pipe at EOL to perl -ne
-"\ep\ep\es":        "\ep\es"                           # pipe at EOL to sed //
-"\ep\ep\es\es":     "\ep\es\es"                        # pipe at EOL to sed s///
-"\ep\ep\ew":        "\ep\ew"                           # pipe at EOL to wc -l
-"\ep\ep\ew\ec":     "\ep\ew\ec"                        # pipe at EOL to wc -c
-"\ep\ep\et":        "\ep\et"                           # pipe at EOL to tee
-"\ep\ep\ew\ea":     "\ep\et\ea"                        # pipe at EOL to tee -a
-"\eP\eP\eS":        "\eP\eS"                           # pipe at EOL to sort
-"\eP\eP\eS\eU":     "\eP\eS\eU"                        # pipe at EOL to sort -u
+"\ep\eg":           " | \ei\eg\e[99~"                   # pipe to grep
+"\ep\eg\ee":        " | \ei\eg\ee\e[99~"                # pipe to grep -E
+"\ep\eg\ev":        " | \ei\eg\ev\e[99~"                # pipe to grep -v
+"\ep\eg\ee\ev":     " | \ei\eg\ee\ev"                   # pipe to grep -Ev
+"\ep\ea":           " | awk '{print ?}' \e[1~\e?"       # pipe to awk
+"\ep\ea\en":        " | awk NF"                         # pipe to awk NF / remove empty lines
+"\ep\ex":           " | xargs "                         # pipe to xargs
+"\ep\el":           " | less "                          # pipe to less
+"\ep\et":           " | tail "                          # pipe to tail
+"\ep\er":           " | read X\e[D"                     # pipe to read
+"\ep\ep\ep":        " | perl -pe ' '\e[D\e[D"           # pipe to perl -pe
+"\ep\ep":           " | perl -ne ' '\e[D\e[D"           # pipe to perl -ne
+"\ep\es":           " | sed -re '/?/'\e[1~\e?"          # pipe to sed //
+"\ep\es\es":        " | sed -re 's/?//'\e[1~\e?"        # pipe to sed s///
+"\ep\ew":           " | wc -l "                         # pipe to wc -l
+"\ep\ew\ec":        " | wc -c "                         # pipe to wc -c
+"\ep\et":           " | tee "                           # pipe to tee
+"\ep\et\ea":        " | tee -a "                        # pipe to tee -a
+"\eP\eS":           " | sort "                          # pipe to sort
+"\eP\eS\eU":        " | sort -u "                       # pipe to sort -u
+"\ep\ep\eg":        "\e[F\ep\eg\e[99~"                  # pipe at EOL to grep
+"\ep\ep\eg\ee":     "\e[F\ep\eg\ee\e[99~"               # pipe at EOL to grep -E
+"\ep\ep\eg\ev":     "\e[F\ep\eg\ev\e[99~"               # pipe at EOL to grep -v
+"\ep\ep\eg\ee\ev":  "\e[F\ep\eg\ee\ev\e[99~"            # pipe at EOL to grep -Ev
+"\ep\ep\ea":        "\e[F\ep\ea\e[99~"                  # pipe at EOL to awk
+"\ep\ep\ea\en":     "\e[F\ep\ea\en\e[99~"               # pipe at EOL to awk NF / remove empty lines
+"\ep\ep\ex":        "\e[F\ep\ex\e[99~"                  # pipe at EOL to xargs
+"\ep\ep\el":        "\e[F\ep\el\e[99~"                  # pipe at EOL to less
+"\ep\ep\et":        "\e[F\ep\et\e[99~"                  # pipe at EOL to tail
+"\ep\ep\er":        "\e[F\ep\er\e[99~"                  # pipe at EOL to read
+"\ep\ep\ep\ep":     "\e[F\ep\ep\ep\e[99~"               # pipe at EOL to perl -pe
+"\ep\ep\ep":        "\e[F\ep\ep\e[99~"                  # pipe at EOL to perl -ne
+"\ep\ep\es":        "\e[F\ep\es\e[99~"                  # pipe at EOL to sed //
+"\ep\ep\es\es":     "\e[F\ep\es\es\e[99~"               # pipe at EOL to sed s///
+"\ep\ep\ew":        "\e[F\ep\ew\e[99~"                  # pipe at EOL to wc -l
+"\ep\ep\ew\ec":     "\e[F\ep\ew\ec\e[99~"               # pipe at EOL to wc -c
+"\ep\ep\et":        "\e[F\ep\et\e[99~"                  # pipe at EOL to tee
+"\ep\ep\ew\ea":     "\e[F\ep\et\ea\e[99~"               # pipe at EOL to tee
+"\eP\eP\eS":        "\e[F\eP\eS\e[99~"                  # pipe at EOL to sort
+"\eP\eP\eS\eU":     "\e[F\eP\eS\eU\e[99~"               # pipe at EOL to sort -u
 
 # (r)edirect std(o)ut, std(e)rr, (a)ll
 "\er\ei":          " 1> "
@@ -125,6 +126,9 @@ $if Bash
 # move cursor
 "\e[1;7H": "\C-b\C-b "                                         # backward to next blank
 "\e[1;7F": "\C-b "                                             # forward to next blank
+
+# session
+"\C-x\C-d": "history -r \er\C-D"
 $endif
 
 # admin helpers
