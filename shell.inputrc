@@ -46,16 +46,14 @@ $if Bash
 "\ei\eg\ee":     "grep -E '?' \e[1~\e?"                 # insert grep -E
 "\ei\eg\ev":     "grep -v '?' \e[1~\e?"                 # insert grep -v
 "\ei\eg\ee\ev":  "grep -Ev '?' \e[1~\e?"                # insert grep -Ev
-"\ei\es":        "sed -re 's|?||'\e[1~\e?"              # insert sed -re 's|<?>||'
+"\ei\es":        "sed -re 's/?//'\e[1~\e?"              # insert sed -re 's|<?>||'
+"\eI\eS":        " -e 's/?//' \e[1~\e?"                 # insert -e 's/<?>//'
 "\ei\es\et":     "sed -n  '/^?/,/^/p'\e[1~\e?"          # insert sed -n '/<?>/,//p'
 "\ei\ed":        "\e.\C-b  ;\C-x\C-x"                   # insert cmd delimiter at next blank
 "\ei\ep":        "\e.\C-b  |\C-x\C-x"                   # insert pipe at next blank
 
-# (a)ppend, e.g. (l)oop - (b)ody
-"\ea\es":        " -e '/?/' \e[1~\e?"                   # append sed match //
-"\ea\es\es":     " -e 's/?//' \e[1~\e?"                 # append sed subst s///
-"\ea\ea\es":     "\e[F\ea\es"                           # append sed match //
-"\ea\ea\es\es":  "\e[F\ea\es\C-s"                       # append sed subst s///
+# insert at (e)ol, e.g. (s)ed
+"\eE\eS":     "\e[F\eI\eS"                              # at EOL append sed subst s///
 
 # (p)ipe to (a)pp, e.g. (p)ipe to (g)rep
 "\ep\eg":           " | \ei\eg\e[99~"                   # pipe to grep
@@ -137,17 +135,19 @@ $if Bash
 "\e$":          "\e[H$\(\e[F) "                                   # subshell $(..)
 "\e\"":         "\e[H\"\e[F\" "                                   # quote "..."
 "\e'":          "\e[H'\e[F' "                                     # quote '...'
-"\el":          "\e[H\e[1~\el\eh \e[F\e[1~\el\eb\e[1~\e?\C-i\C-i" # for loop $i
-"\el\ej":       "\e[H\e[2~\el\eh \e[F\e[2~\el\eb\e[1~\e?\C-i\C-i" # for loop $j
+"\el":          "\e[H\e[1~\el\eh \e[F\e[1~\el\eb\e[1~\e?"         # for loop $i
+"\el\ej":       "\e[H\e[2~\el\eh \e[F\e[2~\el\eb\e[1~\e?"         # for loop $j
 "\eI"           "\e[H\eI\eI\e[F; \eI\eI\eR"                       # IFS=$'\n' and reset
 
 # comments
 "\e+":          "\e.\e[H\e[3~\C-x\C-x\e[D"                       # uncomment (see \e#)
 "\e+\e+":       "\e+\e[F"                                        # uncomment, enforce cursor to end
 
-# move cursor
-"\e[1;7H": "\C-b\C-b "                                         # backward to next blank
-"\e[1;7F": "\C-b "                                             # forward to next blank
+# move cursor / kill words, lines
+"\e[1;7H":  "\C-b\C-b "         # backward to next blank: Ctrl + Fn + Meta + <=
+"\e[1;7F":  "\C-b "             # forward to next blank : Ctrl + Fn + Meta + =>
+"\C-x\C-w": "\e[1;4C\e[1;4D"    # kill word (when cursor inside word)
+"\eX":      "\e[1;4C\e[1;4D"    # kill word (when cursor inside word)
 
 # session
 "\C-x\C-d": "history -r \er\C-D"
@@ -188,7 +188,7 @@ $endif
 "\e/":          complete-filename
 "\e@":          complete-hostname
 "\e~":          complete-username
-"\ev":          complete-variable
+"\eV":          complete-variable
 
 "\C-g\C-w":     glob-complete-word
 "\C-g\C-w\C-x": glob-expand-word
@@ -239,8 +239,8 @@ $endif
 "\e[1;3D":      backward-word                # Meta + <=
 "\e[1;5C":      forward-word                 # Ctrl + =>
 "\e[1;5D":      backward-word                # Ctrl + <=
-"\e[1;4C":      kill-word
-"\e[3;5~":      kill-word
+"\e[1;4C":      kill-word                    # Meta + Shift + =>
+"\e[3;5~":      kill-word                    # Ctrl + Delete
 "\e[1;4D":      backward-kill-word           # Meta + Shift + <=
 "\e\C-?":       backward-kill-word           # Meta + Backspace
 "\C-h":         backward-kill-word           # Ctrl + Backspace / Ctrl + H
