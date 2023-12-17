@@ -27,6 +27,7 @@ $if Bash
 "\e[2~\el\eh":  "for j in"                              # for loop: header, var $j
 "\e[2~\el\eb":  "; do echo $j? ; done"                  # for loop: body, var $j
 "\e[99~":       "\e[C\e[D"
+"\e[2C":        "\e[C\e[C"
 "\e[5C":        "\e[C\e[C\e[C\e[C\e[C"
 "\e[7C":        "\e[5C\e[C\e[C"
 
@@ -40,7 +41,7 @@ $if Bash
 "\eI\e$":        "$(?)\e[1~\e? \e[D"                    # insert subshell $(...)
 "\ei\el":        "\e[1~\el\C-b\C-b*"                    # insert for-loop $i
 "\ei\el\eb":     "\C-b?\C-h\C-h\e[3~"                   # goto body after for-loop
-"\eI\eI":        "OLDIFS=$IFS; $IFS=$'\\n'; "           # insert IFS backup and set $'\n'
+"\eI\eI":        "OLDIFS=$IFS;IFS=$'\\n'; "           # insert IFS backup and set $'\n'
 "\eI\eI\eR":     "IFS=$OLDIFS "                         # insert IFS restore
 "\ei\eg":        "grep '?'\e[1~\e?"                     # insert grep
 "\ei\eg\ee":     "grep -E '?' \e[1~\e?"                 # insert grep -E
@@ -260,6 +261,8 @@ $endif
 
 # editor: MISC: insert, expand and query data
 "\e#":          insert-comment
+"\e#\e#":       "\e[H# !!!REMEMBER!!! # \C-mhistory -w\C-m"
+"\e#\e#\e#":    "\C-b\C-b#\e[2C\e[1;3H\C-m"
 "\ea":          insert-last-argument
 "\C-x\C-x":     exchange-point-and-mark
 "\C-@":         set-mark
